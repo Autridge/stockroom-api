@@ -11,10 +11,18 @@ export interface Item {
   active: boolean;
 }
 
+export interface FindAllQuery {
+  name?: string;
+  active?: string;
+  pageNumber: number;
+  limitNumber: number;
+  sort?: string;
+}
+
 @Injectable()
 export class ItemsService {
-  private items: Item[] = [];
   private nextId = 1;
+  private items: Item[] = [];
 
   create(payload: Partial<Item>) {
     const newItem: Item = {
@@ -32,11 +40,30 @@ export class ItemsService {
     return newItem;
   }
 
-  findAll() {
-    return this.items.filter((item) => item.active);
+  findAll(query: FindAllQuery) {
+    let result = this.items;
+
+    if (query.active) {
+      const isActive = query.active === 'true';
+      result = result.filter((item) => item.active === isActive);
+    } else {
+      result = result.filter((item) => item.active);
+    }
+
+    if (query.name) {
+      const search = query.name.toLowerCase();
+      result = result.filter((item) =>
+        item.name.toLowerCase().includes(search),
+      );
+    } else if (query.sort === 'priceUnits') {
+      result.sort((a, b) => a.priceUnits - b.priceUnits);
+    }
+
+    const startIndex = (query.pageNumber - 1) * query.limitNumber;
+    return result.slice(startIndex, startIndex + query.limitNumber);
   }
 
-  findOne(id: string) {
+  findOne(id: number) {
     const item = this.items.find(
       (item) => item.id === Number(id) && item.active,
     );
@@ -44,13 +71,13 @@ export class ItemsService {
     return item;
   }
 
-  update(id: string, payload: Partial<Item>) {
+  update(id: number, payload: Partial<Item>) {
     const item = this.findOne(id);
     Object.assign(item, payload);
     return item;
   }
 
-  deactivate(id: string) {
+  deactivate(id: number) {
     const item = this.findOne(id);
     item.active = false;
   }
