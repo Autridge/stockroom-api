@@ -9,39 +9,26 @@ import {
   HttpCode,
   ParseIntPipe,
   Query,
-  Headers,
-  BadRequestException,
+  UsePipes,
 } from '@nestjs/common';
 import { ItemsService } from './items.service';
+import { CreateItemDto } from './dto/create-item.dto';
+import { ListItemDto } from './dto/list-items.dto';
+import { SkuNormalizerPipe } from './pipes/sku-normalizer.pipe';
 
 @Controller('items')
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
   @Post()
-  create(@Body() body: any) {
-    return this.itemsService.create(body);
+  @UsePipes(SkuNormalizerPipe)
+  create(@Body() createItemDto: CreateItemDto) {
+    return this.itemsService.create(createItemDto);
   }
 
   @Get()
-  findAll(
-    @Query('name') name?: string,
-    @Query('active') active?: string,
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
-    @Query('sort') sort?: string,
-    @Headers('user-agent') userAgent?: string,
-  ) {
-    const pageNumber = Math.max(1, parseInt(page, 10) || 1);
-    const limitNumber = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
-
-    const allowedSorts = ['name', 'priceUnits'];
-    if (sort && !allowedSorts.includes(sort)) {
-      throw new BadRequestException(
-        `Invalid sort field. Allowed: ${allowedSorts.join}`,
-      );
-    }
-    return this.itemsService.findAll({ name, active, pageNumber, limitNumber });
+  findAll(@Query() query: ListItemDto) {
+    return this.itemsService.findAll(query);
   }
 
   @Get(':id')

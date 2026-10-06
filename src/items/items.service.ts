@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ListItemDto } from './dto/list-items.dto';
 
 export interface Item {
   id: number;
@@ -9,14 +10,6 @@ export interface Item {
   priceUnits: number;
   currency: string;
   active: boolean;
-}
-
-export interface FindAllQuery {
-  name?: string;
-  active?: string;
-  pageNumber: number;
-  limitNumber: number;
-  sort?: string;
 }
 
 @Injectable()
@@ -40,7 +33,7 @@ export class ItemsService {
     return newItem;
   }
 
-  findAll(query: FindAllQuery) {
+  findAll(query: ListItemDto) {
     let result = this.items;
 
     if (query.active) {
@@ -59,8 +52,8 @@ export class ItemsService {
       result.sort((a, b) => a.priceUnits - b.priceUnits);
     }
 
-    const startIndex = (query.pageNumber - 1) * query.limitNumber;
-    return result.slice(startIndex, startIndex + query.limitNumber);
+    const startIndex = (query.pageNumber! - 1) * query.limitNumber!;
+    return result.slice(startIndex, startIndex + query.limitNumber!);
   }
 
   findOne(id: number) {
