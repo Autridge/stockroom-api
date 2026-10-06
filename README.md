@@ -27,14 +27,17 @@ By default, NestJS adheres to standard REST semantics for its routing decorators
 
 In RESTful design, a `PUT` request represents a complete resource replacement. The client must supply the entire resource representation in the payload, and any omitted fields are typically overwritten as null or default values. A `PATCH` request represents a partial update; the client only transmits the specific fields that require modification. leaving the rest of the existing resource state untouched.
 
+# Session-03 - Params, query strings, headers, and parsing
+
 1. What actual data type arrives over HTTP for a route ID?
 
-Everything transmitted over HTTP arrives as a text string. Therefore if a client requests  `/items/123` , the underlying Express adapter hands Nest the string `"123"` . If you simply type `id: number` in your controller signature, Nest ignores it at runtime. This variable remains a string, which means a strict equality check (`===` ) inside the service against a numeric ID will silently fail.
+Everything transmitted over HTTP arrives as a text string. Therefore if a client requests `/items/123` , the underlying Express adapter hands Nest the string `"123"` . If you simply type `id: number` in your controller signature, Nest ignores it at runtime. This variable remains a string, which means a strict equality check (`===` ) inside the service against a numeric ID will silently fail.
 
 2. How does `@Query('page')` differ mechanically from `@Param('id')?`
-- `@Param('id')` extracts variables embedded directly in the URL path itself. When you define a route like `@Get(':id')` , Nest uses a colon to denote a dynamic segment. In `GET /item/42`    , the parameter is exactly 42.
-- `@Query('page)`  extracts key-value pairs appended to the end of the URL after a question mark. In `GET /items?page=2&limit=10` , the query strings are the `page` and `limit` .
 
-3. Why does simply typing `id: number` in TypeScript fail to parse the input?  
+- `@Param('id')` extracts variables embedded directly in the URL path itself. When you define a route like `@Get(':id')` , Nest uses a colon to denote a dynamic segment. In `GET /item/42` , the parameter is exactly 42.
+- `@Query('page)` extracts key-value pairs appended to the end of the URL after a question mark. In `GET /items?page=2&limit=10` , the query strings are the `page` and `limit` .
+
+3. Why does simply typing `id: number` in TypeScript fail to parse the input?
 
 If you simply type `id: number` in your controller signature, Nest ignores it at runtime. This variable remains a string, which means a strict equality check (`===` ) inside the service against a numeric ID will silently fail.
